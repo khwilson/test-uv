@@ -1,0 +1,19 @@
+[project]
+name = "setup-uv-from-url"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Kevin H Wilson", email = "khwilson@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "click"
+]
+
+[project.scripts]
+setup-uv-from-url = "setup_uv_from_url:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

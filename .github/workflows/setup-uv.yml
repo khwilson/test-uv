@@ -1,0 +1,41 @@
+name: Setup UV
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    env:
+      UV_PYTHON_INSTALL_DIR: ~/.python
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache uv dependencies
+        id: cache-uv
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/uv
+            ~/.uv
+            ~/.uv-bin
+            ~/.python
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/uv.lock') }}
+
+      - if: ${{ steps.cache-uv.outputs.cache-hit != 'true' }}
+        name: Download and install uv
+        run: |
+          curl -L "${{ github.event.inputs.uv_url }}" -o uv.tar.gz
+          mkdir -p ~/.uv-bin
+          tar -xzf uv.tar.gz --strip-components=1 -C ~/.uv-bin
+          chmod +x ~/.uv-bin/uv ~/.uv-bin/uvx
+
+      - name: Setup paths
+        run: echo ~/.uv-bin >> $GITHUB_PATH
+
+      - name: Run uv sync
+        run: |
+          uv sync
+          uv run setup-uv-from-url
