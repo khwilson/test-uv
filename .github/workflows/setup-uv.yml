@@ -8,34 +8,40 @@ jobs:
     runs-on: ubuntu-latest
     env:
       UV_PYTHON_INSTALL_DIR: ~/.python
+      _UV_DOWNLOAD_URL: https://github.com/astral-sh/uv/releases/download/v0.10.0/uv-linux-x64
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache uv dependencies
-        id: cache-uv
-        uses: actions/cache@v3
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          path: |
-            ~/.cache/uv
-            ~/.uv
-            ~/.uv-bin
-            ~/.python
-          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/uv.lock') }}
+          version: "0.7.6"
 
-      - if: ${{ steps.cache-uv.outputs.cache-hit != 'true' }}
-        name: Download and install uv
-        run: |
-          curl -L "${{ github.event.inputs.uv_url }}" -o uv.tar.gz
-          mkdir -p ~/.uv-bin
-          tar -xzf uv.tar.gz --strip-components=1 -C ~/.uv-bin
-          chmod +x ~/.uv-bin/uv ~/.uv-bin/uvx
+    #   - name: Cache uv dependencies
+    #     id: cache-uv
+    #     uses: actions/cache@v3
+    #     with:
+    #       path: |
+    #         ~/.cache/uv
+    #         ~/.uv
+    #         ~/.uv-bin
+    #         ~/.python
+    #       key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}-${{ hashFiles('**/uv.lock') }}
 
-      - name: Setup paths
-        run: echo ~/.uv-bin >> $GITHUB_PATH
+    #   - if: ${{ steps.cache-uv.outputs.cache-hit != 'true' }}
+    #     name: Download and install uv
+    #     run: |
+    #       curl -L "${{ env._UV_DOWNLOAD_URL }}" -o uv.tar.gz
+    #       mkdir -p ~/.uv-bin
+    #       tar -xzf uv.tar.gz --strip-components=1 -C ~/.uv-bin
+    #       chmod +x ~/.uv-bin/uv ~/.uv-bin/uvx
 
-      - name: Run uv sync
-        run: |
-          uv sync
-          uv run setup-uv-from-url
+    #   - name: Setup paths
+    #     run: echo ~/.uv-bin >> $GITHUB_PATH
+
+    #   - name: Run uv sync
+    #     run: |
+    #       uv sync
+    #       uv run setup-uv-from-url
